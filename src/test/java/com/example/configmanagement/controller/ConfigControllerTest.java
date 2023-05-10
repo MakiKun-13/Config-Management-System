@@ -7,6 +7,7 @@ import com.example.configmanagement.entity.Config;
 import com.example.configmanagement.repository.ConfigRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -17,14 +18,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -41,7 +38,7 @@ class ConfigControllerTest {
     @Mock
     private ConfigRepository configRepository;
 
-     Config CONFIG_1 = new Config("0001", "key_1", "value_1", "env_1", "systemId_1");
+    Config CONFIG_1 = new Config("0001", "key_1", "value_1", "env_1", "systemId_1");
 
     Optional<Config> CONFIG_2 = Optional.of(new Config("0002", "key_2", "value_2", "env_2", "systemId_2"));
 
@@ -80,7 +77,6 @@ class ConfigControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-                //.andExpect(MockMvcResultMatchers.jsonPath("$", notNullValue()));
     }
 
     public String asJsonString(Object object) throws JsonProcessingException {
@@ -96,15 +92,16 @@ class ConfigControllerTest {
 
     @Test
     public void testUpdateConfig() throws Exception {
-        when(configRepository.findById("0001")).thenReturn(CONFIG_2);
-        //Assertions.assertEquals(CONFIG_2.isPresent());
-        when(CONFIG_2.isPresent()).thenReturn(true);
+        Map<String, Object> updates=new HashMap<>();
+        when(configRepository.findById("0002")).thenReturn(CONFIG_2);
+        Assertions.assertTrue(CONFIG_2.isPresent());
+        updates.put("environment", "STAGE");
         mockMvc.perform(MockMvcRequestBuilders
-                .patch("/config/{configId}", "0001")
+                .patch("/config/{configId}", "0002")
+                        .content(asJsonString(updates))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andDo(print());
     }
-
 }
