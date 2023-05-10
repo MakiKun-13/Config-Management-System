@@ -1,5 +1,5 @@
 /**
- * End to End Testing Class
+ * End to End Testing Class for ConfigController
  */
 package com.example.configmanagement.controller;
 
@@ -48,6 +48,10 @@ class ConfigControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(configController).build();
     }
 
+    public String asJsonString(Object object) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(object);
+    }
+
     @Test
     public void testViewConfig() throws Exception {
         when(configRepository.findById("0001")).thenReturn(Optional.ofNullable(CONFIG_1));
@@ -77,10 +81,6 @@ class ConfigControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
-
-    public String asJsonString(Object object) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(object);
     }
 
     @Test
